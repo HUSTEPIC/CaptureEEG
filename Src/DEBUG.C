@@ -7,8 +7,7 @@
                      (1)、串口0输出打印信息，波特率可调;              				   
 *******************************************************************************/
 
-#include <stdio.h>
-#include "CH559.H"
+#include "DEBUG.h"
 
 #define	 FREQ_SYS	12000000	                                                   //系统主频12MHz
 #ifndef  BOUND
@@ -25,16 +24,16 @@
 * Output         : None
 * Return         : None
 *******************************************************************************/ 
-void	CfgFsys( )  
-{
-    SAFE_MOD = 0x55;                                                           //开启安全模式
-    SAFE_MOD = 0xAA;                                                 
-    CLOCK_CFG |= bOSC_EN_XT;                                                   //使能外部晶振                                         
-    CLOCK_CFG &= ~bOSC_EN_INT;                                                
-//	PLL_CFG = 0x18;                                                            //配置系统时钟
-//	CLOCK_CFG = 0x0c;
-    SAFE_MOD = 0xFF;                                                           //关闭安全模式  
-}
+//void	CfgFsys( )  
+//{
+//    SAFE_MOD = 0x55;                                                           //开启安全模式
+//    SAFE_MOD = 0xAA;                                                 
+//    CLOCK_CFG |= bOSC_EN_XT;                                                   //使能外部晶振                                         
+//    CLOCK_CFG &= ~bOSC_EN_INT;                                                
+////	PLL_CFG = 0x18;                                                            //配置系统时钟
+////	CLOCK_CFG = 0x0c;
+//    SAFE_MOD = 0xFF;                                                           //关闭安全模式  
+//}
 
 /*******************************************************************************
 * Function Name  : mDelayus(UNIT16 n)
@@ -118,13 +117,13 @@ void	mDelaymS( UINT16 n )                                                  // 以
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void CH559UART0Alter()
-{
-    PORT_CFG |= bP0_OC;
-    P0_DIR |= bTXD_;
-    P0_PU |= bTXD_ | bRXD_;
-    PIN_FUNC |= bUART0_PIN_X;                                                  //串口映射到P0.2和P0.3
-}
+//void CH559UART0Alter()
+//{
+//    PORT_CFG |= bP0_OC;
+//    P0_DIR |= bTXD_;
+//    P0_PU |= bTXD_ | bRXD_;
+//    PIN_FUNC |= bUART0_PIN_X;                                                  //串口映射到P0.2和P0.3
+//}
 
 /*******************************************************************************
 * Function Name  : mInitSTDIO()
@@ -166,12 +165,12 @@ void	mInitSTDIO( )
 * Output         : None
 * Return         : SBUF
 *******************************************************************************/
-UINT8  CH559UART0RcvByte( )
-{
-    while(RI == 0);                                                            //查询接收，中断方式可不用
-    RI = 0;
-    return SBUF;
-}
+//UINT8  CH559UART0RcvByte( )
+//{
+//    while(RI == 0);                                                            //查询接收，中断方式可不用
+//    RI = 0;
+//    return SBUF;
+//}
 
 /*******************************************************************************
 * Function Name  : CH559UART0SendByte(UINT8 SendDat)
@@ -180,9 +179,9 @@ UINT8  CH559UART0RcvByte( )
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void CH559UART0SendByte(UINT8 SendDat)
-{
-	SBUF = SendDat;                                                              //查询发送，中断方式可不用下面2条语句,但发送前需TI=0
-	while(TI ==0);
-	TI = 1;
-}
+//void CH559UART0SendByte(UINT8 SendDat)
+//{
+//	SBUF = SendDat;                                                              //查询发送，中断方式可不用下面2条语句,但发送前需TI=0
+//	while(TI ==0);
+//	TI = 1;
+//}

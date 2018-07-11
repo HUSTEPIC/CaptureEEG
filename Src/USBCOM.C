@@ -5,7 +5,8 @@
 * Date               : 2015/05/20
 * Description        : CH559模拟串口
 *******************************************************************************/
-#include <CH559.H>
+//#include "CH559.H"
+//#define __BASE_TYPE__
 #include <string.h>
 #include "DEBUG.C"
 
@@ -24,15 +25,15 @@ USB_SETUP_REQ	           SetupReqBuf;                                          /
 #define UsbSetupBuf     ((PUSB_SETUP_REQ)Ep0Buffer)
 
  
-UINT8C DevDesc[18]={0x12,0x01,0x10,0x01,0xff,0x00,0x02,0x08,                   //设备描述符
+UINT8C DevDesc[18]={0x12,0x01,0x10,0x01,0xff,0x00,0x02,0x08,                   //设备描述符，0x01，ox10版本号，0x01设备类别（音频），0x40端点0支持的最大数据包
                     0x86,0x1a,0x23,0x55,0x04,0x03,0x00,0x00,
                     0x00,0x01};
 
-UINT8C CfgDesc[39]={0x09,0x02,0x27,0x00,0x01,0x01,0x00,0x80,0xf0,              //配置描述符，接口描述符,端点描述符
-	                0x09,0x04,0x00,0x00,0x03,0xff,0x01,0x02,0x00,           
-                    0x07,0x05,0x82,0x02,0x20,0x00,0x00,                        //批量上传端点
-		            0x07,0x05,0x02,0x02,0x20,0x00,0x00,                        //批量下传端点      
-			        0x07,0x05,0x81,0x03,0x08,0x00,0x01};                       //中断上传端点
+UINT8C CfgDesc[39]={0x09,0x02,0x27,0x00,0x01,0x01,0x00,0x80,0xf0,              //配置描述符，0x0027字节配置信息长度，0x01个接口数
+	                0x09,0x04,0x00,0x00,0x03,0xff,0x01,0x02,0x00,              //接口描述符，0x03端点数，0x01设备类别（音频），子类代码，协议代码，接口字符串描述符索引值
+                    0x07,0x05,0x82,0x02,0x20,0x00,0x00,                        //端点描述符，IN 2，同步上传
+		            0x07,0x05,0x02,0x02,0x20,0x00,0x00,                        //端点描述符，OUT2，同步下传     
+			        0x07,0x05,0x81,0x03,0x08,0x00,0x01};                       //端点描述符，IN 1，中断上传，端点支持的最大数据包长度
 
 UINT8C DataBuf[26]={0x30,0x00,0xc3,0x00,0xff,0xec,0x9f,0xec,0xff,0xec,0xdf,0xec,
                     0xdf,0xec,0xdf,0xec,0x9f,0xec,0x9f,0xec,0x9f,0xec,0x9f,0xec,
@@ -167,7 +168,7 @@ void	DeviceInterrupt( void ) interrupt INT_NO_USB using 1                       
 		 case UIS_TOKEN_OUT | 2:                                                 //endpoint 2# 中断下传					 
 			LEN = USB_RX_LEN; 
 			RecieveData();
-            SendData(RecBuf);			 
+            //SendData(RecBuf);			 
 			break;
 		 case UIS_TOKEN_IN | 2:                                                  //endpoint 2# 中断上传
             UEP2_T_LEN = 0;	                                                     //预使用发送长度一定要清空						 
@@ -321,13 +322,12 @@ void main()
 	mDelaymS(30);                                                                 //上电延时
 //  CfgFsys( );                                                                   //CH559时钟选择配置    
     mInitSTDIO( );                                                                //串口0,可以用于调试
-	  USBDeviceCfg();                                                               //设备模式配置
+	USBDeviceCfg();                                                               //设备模式配置
     USBDeviceEndPointCfg();														                            //端点配置
     USBDeviceIntCfg();															                              //中断初始化
 	UEP0_T_LEN = 0;
     UEP1_T_LEN = 0;	                                                              //预使用发送长度一定要清空	
     UEP2_T_LEN = 0;	
-	//data1=(UINT8)'0';
     while(1)
     {      
 		   Flag =1;
