@@ -4,45 +4,45 @@
 * Version            : V1.0
 * Date               : 2015/05/20
 * Description        : CH559 DBUG Interface
-                     (1)������0�����ӡ��Ϣ�������ʿɵ�;              				   
+                     (1)、串口0输出打印信息，波特率可调;              				   
 *******************************************************************************/
 
 #include "DEBUG.h"
 
-#define	 FREQ_SYS	12000000	                                                   //ϵͳ��Ƶ12MHz
+#define	 FREQ_SYS	12000000	                                                   //系统主频12MHz
 #ifndef  BOUND
 #define  BOUND    57600
 #endif
 
 /*******************************************************************************
 * Function Name  : CfgFsys( )
-* Description    : CH559ʱ��ѡ������ú���,Ĭ��ʹ���ڲ�����12MHz�����������FREQ_SYS����
-                   ����PLL_CFG��CLOCK_CFG���õõ�����ʽ���£�
+* Description    : CH559时钟选择和配置函数,默认使用内部晶振12MHz，如果定义了FREQ_SYS可以
+                   根据PLL_CFG和CLOCK_CFG配置得到，公式如下：
                    Fsys = (Fosc * ( PLL_CFG & MASK_PLL_MULT ))/(CLOCK_CFG & MASK_SYS_CK_DIV);
-                   ����ʱ����Ҫ�Լ�����
+                   具体时钟需要自己配置
 * Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/ 
 //void	CfgFsys( )  
 //{
-//    SAFE_MOD = 0x55;                                                           //������ȫģʽ
+//    SAFE_MOD = 0x55;                                                           //开启安全模式
 //    SAFE_MOD = 0xAA;                                                 
-//    CLOCK_CFG |= bOSC_EN_XT;                                                   //ʹ���ⲿ����                                         
+//    CLOCK_CFG |= bOSC_EN_XT;                                                   //使能外部晶振                                         
 //    CLOCK_CFG &= ~bOSC_EN_INT;                                                
-////	PLL_CFG = 0x18;                                                            //����ϵͳʱ��
+////	PLL_CFG = 0x18;                                                            //配置系统时钟
 ////	CLOCK_CFG = 0x0c;
-//    SAFE_MOD = 0xFF;                                                           //�رհ�ȫģʽ  
+//    SAFE_MOD = 0xFF;                                                           //关闭安全模式  
 //}
 
 /*******************************************************************************
 * Function Name  : mDelayus(UNIT16 n)
-* Description    : us��ʱ����
+* Description    : us延时函数
 * Input          : UNIT16 n
 * Output         : None
 * Return         : None
 *******************************************************************************/ 
-void	mDelayuS( UINT16 n )  // ��uSΪ��λ��ʱ
+void	mDelayuS( UINT16 n )  // 以uS为单位延时
 {
 	while ( n ) {  // total = 12~13 Fsys cycles, 1uS @Fsys=12MHz
 		++ SAFE_MOD;  // 2 Fsys cycles, for higher Fsys, add operation here
@@ -96,12 +96,12 @@ void	mDelayuS( UINT16 n )  // ��uSΪ��λ��ʱ
 
 /*******************************************************************************
 * Function Name  : mDelayms(UNIT16 n)
-* Description    : ms��ʱ����
+* Description    : ms延时函数
 * Input          : UNIT16 n
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void	mDelaymS( UINT16 n )                                                  // ��mSΪ��λ��ʱ
+void	mDelaymS( UINT16 n )                                                  // 以mS为单位延时
 {
 	while ( n ) 
 	{
@@ -112,7 +112,7 @@ void	mDelaymS( UINT16 n )                                                  // ��
 
 /*******************************************************************************
 * Function Name  : CH559UART0Alter()
-* Description    : CH559����0����ӳ��,����ӳ�䵽P0.2��P0.3
+* Description    : CH559串口0引脚映射,串口映射到P0.2和P0.3
 * Input          : None
 * Output         : None
 * Return         : None
@@ -122,13 +122,13 @@ void	mDelaymS( UINT16 n )                                                  // ��
 //    PORT_CFG |= bP0_OC;
 //    P0_DIR |= bTXD_;
 //    P0_PU |= bTXD_ | bRXD_;
-//    PIN_FUNC |= bUART0_PIN_X;                                                  //����ӳ�䵽P0.2��P0.3
+//    PIN_FUNC |= bUART0_PIN_X;                                                  //串口映射到P0.2和P0.3
 //}
 
 /*******************************************************************************
 * Function Name  : mInitSTDIO()
-* Description    : CH559����0��ʼ��,Ĭ��ʹ��T1��UART0�Ĳ����ʷ�����,Ҳ����ʹ��T2
-                   ��Ϊ�����ʷ�����
+* Description    : CH559串口0初始化,默认使用T1作UART0的波特率发生器,也可以使用T2
+                   作为波特率发生器
 * Input          : None
 * Output         : None
 * Return         : None
@@ -140,48 +140,48 @@ void	mInitSTDIO( )
 
     SM0 = 0;
     SM1 = 1;
-    SM2 = 0;                                                                   //����0ʹ��ģʽ1
-                                                                               //ʹ��Timer1��Ϊ�����ʷ�����
-    RCLK = 0;                                                                  //UART0����ʱ��
-    TCLK = 0;                                                                  //UART0����ʱ��
+    SM2 = 0;                                                                   //串口0使用模式1
+                                                                               //使用Timer1作为波特率发生器
+    RCLK = 0;                                                                  //UART0接收时钟
+    TCLK = 0;                                                                  //UART0发送时钟
     PCON |= SMOD;
     x = 10 * FREQ_SYS / BOUND / 16;                             
     x2 = x % 10;
     x /= 10;
-    if ( x2 >= 5 ) x ++;                                                       //��������
+    if ( x2 >= 5 ) x ++;                                                       //四舍五入
 
-    TMOD = TMOD & ~ bT1_GATE & ~ bT1_CT & ~ MASK_T1_MOD | bT1_M1;              //0X20��Timer1��Ϊ8λ�Զ����ض�ʱ��
-    T2MOD = T2MOD | bTMR_CLK | bT1_CLK;                                        //Timer1ʱ��ѡ��
-    TH1 = 0-x;                                                                 //12MHz����,bound/12Ϊʵ�������ò�����
-    TR1 = 1;                                                                   //������ʱ��1
+    TMOD = TMOD & ~ bT1_GATE & ~ bT1_CT & ~ MASK_T1_MOD | bT1_M1;              //0X20，Timer1作为8位自动重载定时器
+    T2MOD = T2MOD | bTMR_CLK | bT1_CLK;                                        //Timer1时钟选择
+    TH1 = 0-x;                                                                 //12MHz晶振,bound/12为实际需设置波特率
+    TR1 = 1;                                                                   //启动定时器1
     TI = 1;
-    REN = 1;                                                                   //����0����ʹ��
+    REN = 1;                                                                   //串口0接收使能
 }
 
 /*******************************************************************************
 * Function Name  : CH559UART0RcvByte()
-* Description    : CH559UART0����һ���ֽ�
+* Description    : CH559UART0接收一个字节
 * Input          : None
 * Output         : None
 * Return         : SBUF
 *******************************************************************************/
 //UINT8  CH559UART0RcvByte( )
 //{
-//    while(RI == 0);                                                            //��ѯ���գ��жϷ�ʽ�ɲ���
+//    while(RI == 0);                                                            //查询接收，中断方式可不用
 //    RI = 0;
 //    return SBUF;
 //}
 
 /*******************************************************************************
 * Function Name  : CH559UART0SendByte(UINT8 SendDat)
-* Description    : CH559UART0����һ���ֽ�
-* Input          : UINT8 SendDat��Ҫ���͵�����
+* Description    : CH559UART0发送一个字节
+* Input          : UINT8 SendDat；要发送的数据
 * Output         : None
 * Return         : None
 *******************************************************************************/
 //void CH559UART0SendByte(UINT8 SendDat)
 //{
-//	SBUF = SendDat;                                                              //��ѯ���ͣ��жϷ�ʽ�ɲ�������2�����,������ǰ��TI=0
+//	SBUF = SendDat;                                                              //查询发送，中断方式可不用下面2条语句,但发送前需TI=0
 //	while(TI ==0);
 //	TI = 1;
 //}

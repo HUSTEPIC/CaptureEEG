@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>Target 1</TargetName>
+      <TargetName>CaptureEEG</TargetName>
       <ToolsetNumber>0x0</ToolsetNumber>
       <ToolsetName>MCS-51</ToolsetName>
       <uAC6>0</uAC6>
@@ -374,12 +374,27 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>USBCom</GroupName>
+          <GroupName>CaptureEEG</GroupName>
           <Files>
+            <File>
+              <FileName>DEBUG.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\DEBUG.C</FilePath>
+            </File>
             <File>
               <FileName>USBCOM.C</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\USBCOM.C</FilePath>
+            </File>
+            <File>
+              <FileName>ADS1299.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\ADS1299.C</FilePath>
+            </File>
+            <File>
+              <FileName>MAIN.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\MAIN.C</FilePath>
             </File>
           </Files>
         </Group>

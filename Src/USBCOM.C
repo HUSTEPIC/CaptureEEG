@@ -5,26 +5,22 @@
 * Date               : 2015/05/20
 * Description        : CH559模拟串口
 *******************************************************************************/
-//#include "CH559.H"
-//#define __BASE_TYPE__
+#include "CH559.H"
+#define __BASE_TYPE__
 #include <string.h>
-#include "DEBUG.C"
-
-
-#define THIS_ENDP0_SIZE         DEFAULT_ENDP0_SIZE
+#include "DEBUG.h"
+#include "USBCOM.h"
 
 UINT8X	Ep0Buffer[THIS_ENDP0_SIZE] _at_ 0x0000;                                //端点0 OUT&IN缓冲区，必须是偶地址
 UINT8X	Ep2Buffer[2*MAX_PACKET_SIZE] _at_ 0x0008;                              //端点2 IN&OUT缓冲区,必须是偶地址
 UINT8X  Ep1Buffer[MAX_PACKET_SIZE] _at_ 0x00a0;
 
-UINT8	  SetReqtp,SetupReq,SetupLen,UsbConfig,Flag;
+UINT8	SetReqtp,SetupReq,SetupLen,UsbConfig,Flag;
 PUINT8  pDescr;	                                                               
 UINT8   num = 0;
 UINT8   LEN = 0;
 USB_SETUP_REQ	           SetupReqBuf;                                          //暂存Setup包
-#define UsbSetupBuf     ((PUSB_SETUP_REQ)Ep0Buffer)
 
- 
 UINT8C DevDesc[18]={0x12,0x01,0x10,0x01,0xff,0x00,0x02,0x08,                   //设备描述符，0x01，ox10版本号，0x01设备类别（音频），0x40端点0支持的最大数据包
                     0x86,0x1a,0x23,0x55,0x04,0x03,0x00,0x00,
                     0x00,0x01};
@@ -121,6 +117,7 @@ void USBDeviceEndPointCfg()
 *******************************************************************************/
 void SendData( PUINT8 SendBuf )
 {
+	Flag =1;
 	 if(Flag==1)                             
 	 {
 	 LEN = sizeof(SendBuf);
@@ -133,7 +130,8 @@ void SendData( PUINT8 SendBuf )
      }
      memcpy(&Ep2Buffer[MAX_PACKET_SIZE],SendBuf,LEN);
 	   UEP2_T_LEN = LEN;
-	   UEP2_CTRL &= ~(bUEP_T_RES1 | bUEP_T_RES0);		 		
+	   UEP2_CTRL &= ~(bUEP_T_RES1 | bUEP_T_RES0);
+     while(( UEP2_CTRL & MASK_UEP_T_RES ) == UEP_T_RES_ACK);                  //	 
      Flag = 0;		 
    }
 }
@@ -172,7 +170,7 @@ void	DeviceInterrupt( void ) interrupt INT_NO_USB using 1                       
 			break;
 		 case UIS_TOKEN_IN | 2:                                                  //endpoint 2# 中断上传
             UEP2_T_LEN = 0;	                                                     //预使用发送长度一定要清空						 
-	        UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;            //默认应答ACK					 
+	        //UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;            //默认应答ACK					 
     		UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;            //默认应答NAK
 			break;
     	 case UIS_TOKEN_SETUP | 0:                                               //SETUP事务
@@ -314,29 +312,15 @@ void	DeviceInterrupt( void ) interrupt INT_NO_USB using 1                       
 	}      
 }
 
-
-void main()
+void USB_SEND_TEST()
 {
 	UINT8 data1[8]=0;
 	UINT8 charx[32]= {0};
-	mDelaymS(30);                                                                 //上电延时
-//  CfgFsys( );                                                                   //CH559时钟选择配置    
-    mInitSTDIO( );                                                                //串口0,可以用于调试
-	USBDeviceCfg();                                                               //设备模式配置
-    USBDeviceEndPointCfg();														                            //端点配置
-    USBDeviceIntCfg();															                              //中断初始化
-	UEP0_T_LEN = 0;
-    UEP1_T_LEN = 0;	                                                              //预使用发送长度一定要清空	
-    UEP2_T_LEN = 0;	
-    while(1)
-    {      
-		   Flag =1;
-		   if(data1[0]<9)data1[0]++;
-		   else data1[0]=0;
+    while(1){
+	if(data1[0]<9)data1[0]++;
+    else data1[0]=0;
 		   
-		   charx[0]=data1[0]+48;
-		   SendData(&charx[0]);
- 		   mDelaymS(5);                                                         //模拟单片机做其它事				
-    }
+   charx[0]=data1[0]+48;
+   SendData(&charx[0]);			
+   }
 }
-

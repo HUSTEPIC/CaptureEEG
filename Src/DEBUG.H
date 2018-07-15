@@ -1,12 +1,14 @@
-/* µ÷ÊÔ */
-/* Ìá¹©printf×Ó³ÌĞòºÍÑÓÊ±º¯Êı */
-#include <stdio.h>
-#include "CH559.h"
+/* è°ƒè¯• */
+/* æä¾›printfå­ç¨‹åºå’Œå»¶æ—¶å‡½æ•° */
 
 #ifndef	__DEBUG_H__
 #define __DEBUG_H__
 
-//¶¨Òåº¯Êı·µ»ØÖµ
+#include <stdio.h>
+#define NO_XSFR_DEFINE
+#include "CH559.h"
+
+//å®šä¹‰å‡½æ•°è¿”å›å€¼
 #ifndef  SUCESS
 #define  SUCESS  1
 #endif
@@ -14,19 +16,19 @@
 #define  FAIL    0
 #endif
 
-//¶¨Òå¶¨Ê±Æ÷ÆğÊ¼
-#ifndef  START
-#define  START  1
-#endif
-#ifndef  STOP
-#define  STOP    0
-#endif
+//å®šä¹‰å®šæ—¶å™¨èµ·å§‹
+//#ifndef  START
+//#define  START  1
+//#endif
+//#ifndef  STOP
+//#define  STOP    0
+//#endif
 
-void	CfgFsys( );                        //CH559Ê±ÖÓÑ¡ÔñºÍÅäÖÃ
-void	mDelayuS( UINT16 n );              // ÒÔuSÎªµ¥Î»ÑÓÊ±
-void	mDelaymS( UINT16 n );              // ÒÔmSÎªµ¥Î»ÑÓÊ±
-void  CH559UART0Alter();                 //CH559´®¿Ú0Òı½ÅÓ³Éäµ½P0.2/P0.3
-void	mInitSTDIO( );                      //T1×÷Îª²¨ÌØÂÊ·¢ÉúÆ÷
-UINT8 CH559UART0RcvByte( );              //CH559 UART0²éÑ¯·½Ê½½ÓÊÕÒ»¸ö×Ö½Ú
-void  CH559UART0SendByte(UINT8 SendDat); //CH559UART0·¢ËÍÒ»¸ö×Ö½Ú
+void	CfgFsys( );                        //CH559æ—¶é’Ÿé€‰æ‹©å’Œé…ç½®
+void	mDelayuS( UINT16 n );              // ä»¥uSä¸ºå•ä½å»¶æ—¶
+void	mDelaymS( UINT16 n );              // ä»¥mSä¸ºå•ä½å»¶æ—¶
+void  CH559UART0Alter();                 //CH559ä¸²å£0å¼•è„šæ˜ å°„åˆ°P0.2/P0.3
+void	mInitSTDIO( );                      //T1ä½œä¸ºæ³¢ç‰¹ç‡å‘ç”Ÿå™¨
+UINT8 CH559UART0RcvByte( );              //CH559 UART0æŸ¥è¯¢æ–¹å¼æ¥æ”¶ä¸€ä¸ªå­—èŠ‚
+void  CH559UART0SendByte(UINT8 SendDat); //CH559UART0å‘é€ä¸€ä¸ªå­—èŠ‚
 #endif
