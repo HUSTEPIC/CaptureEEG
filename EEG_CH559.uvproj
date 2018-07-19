@@ -348,7 +348,7 @@
             <DataOverlaying>1</DataOverlaying>
             <OverlayString></OverlayString>
             <MiscControls></MiscControls>
-            <DisableWarningNumbers></DisableWarningNumbers>
+            <DisableWarningNumbers>16</DisableWarningNumbers>
             <LinkerCmdFile></LinkerCmdFile>
             <Assign></Assign>
             <ReserveString></ReserveString>
@@ -395,6 +395,11 @@
               <FileName>MAIN.C</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\MAIN.C</FilePath>
+            </File>
+            <File>
+              <FileName>GPIO.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\GPIO.C</FilePath>
             </File>
           </Files>
         </Group>

@@ -105,6 +105,10 @@ void USBDeviceEndPointCfg()
     UEP0_DMA = Ep0Buffer;                                                      //端点0数据传输地址
     UEP4_1_MOD &= ~(bUEP4_RX_EN | bUEP4_TX_EN);								                 //端点0单64字节收发缓冲区
     UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;                                 //OUT事务返回ACK，IN事务返回NAK
+	
+	UEP0_T_LEN = 0;
+    UEP1_T_LEN = 0;	                                                              //预使用发送长度一定要清空	
+    UEP2_T_LEN = 0;	
 }
 
 
@@ -314,13 +318,15 @@ void	DeviceInterrupt( void ) interrupt INT_NO_USB using 1                       
 
 void USB_SEND_TEST()
 {
-	UINT8 data1[8]=0;
-	UINT8 charx[32]= {0};
+	UINT8 data1[3]={0,0,0};
+	UINT8 charx[3]={0,0,0};
     while(1){
-	if(data1[0]<9)data1[0]++;
-    else data1[0]=0;
+	if(data1[2]<9)data1[2]++;
+    else data1[2]=0;
 		   
-   charx[0]=data1[0]+48;
-   SendData(&charx[0]);			
+    charx[2]=data1[2]+48;
+    SendData(charx);
+	//mDelaymS(1);
+		
    }
 }

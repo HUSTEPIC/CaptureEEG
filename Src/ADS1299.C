@@ -8,12 +8,12 @@ UINT32 ch0,ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8;
 void WREG(UINT8 x,UINT8 y,UINT8 d)	   //只写一个字节
 {  
    UINT8 i;
-   x=x|0x40;  
+   x=x|0x40;
    y=y&0x1F;
    ASCLK = 0;
    CS=0;
-   mDelaymS(1);
-      for (i=0;i<8;i++)	   //写地址
+   mDelayuS(1);
+   for (i=0;i<8;i++)	   //写地址
    {
     	if(x&0x80)
  			DIN = 1;
@@ -21,35 +21,35 @@ void WREG(UINT8 x,UINT8 y,UINT8 d)	   //只写一个字节
 			DIN = 0;
       	ASCLK = 1;
 	    x<<= 1;
-	    mDelaymS(2)  ;
+	    mDelayuS(2);
 	    ASCLK = 0; 
-     	mDelaymS(2);
+     	mDelayuS(2);
    }
-  mDelaymS(8);
-	 for (i=0;i<8;i++)	    //写寄存器数
-	{
+   mDelayuS(8);
+   for (i=0;i<8;i++)	    //写寄存器数
+   {
 		if(y&0x80)
 			DIN = 1;
 		else
 			DIN = 0;
 		ASCLK = 1;
 		y<<= 1;
-		mDelaymS(2)  ;
+		mDelayuS(2)  ;
 		ASCLK = 0; 
-		mDelaymS(2);
-	 }
-  mDelaymS(2);
-     for (i=0;i<8;i++)		//写数据
-  {
+		mDelayuS(2);
+   }
+   mDelayuS(2);
+   for (i=0;i<8;i++)		//写数据
+   {
   	if(d&0x80)
 			DIN = 1;
 	else
 			DIN = 0;
 	ASCLK = 1;
 	d<<= 1;
-	mDelaymS(2)  ;
+	mDelayuS(2)  ;
 	ASCLK = 0; 
-  	mDelaymS(2);
+  	mDelayuS(2);
   }
   CS=1;
   ASCLK=0;
@@ -108,7 +108,7 @@ void send_C(UINT8 C)
   UINT8 i;
   ASCLK = 0;
   CS=0;
-  mDelaymS(1);
+  mDelayuS(1);
   for (i=0;i<8;i++)
   {
   	if(C&0x80)
@@ -117,9 +117,9 @@ void send_C(UINT8 C)
 			DIN = 0;
 	ASCLK = 1;
 	C<<= 1;
-	mDelaymS(2)  ;
+	mDelayuS(2)  ;
 	ASCLK = 0; 
-  	mDelaymS(1);
+  	mDelayuS(1);
   }
    CS=1;
 }
@@ -127,15 +127,16 @@ void send_C(UINT8 C)
 // ******************************************
 unsigned long readA()
 {	 
-	 UINT8 i;
-     unsigned long ch=0; 
+	UINT8 i;
+    unsigned long ch=0; 
    	for(i=0;i<24;i++)
-	{   ch=ch<<1;
+	{
+       ch=ch<<1;
 	   ASCLK=0;
-	   mDelaymS(2);
+	   mDelayuS(2);
 	   ASCLK=1;
-	  	mDelaymS(2);
-		 if(DOUT==1)	ch=ch|0x01; 
+	   mDelayuS(2);
+	   if(DOUT==1)	ch=ch|0x01; 
 	   DIN=0; 
 	}
 	return ch;
@@ -160,17 +161,18 @@ void readADS()
 //*****************************
  void init_ADS()
  {
+	PWDN=1;
  	START=0;
 	ASCLK=0;
 	CS=1;
-	REST=1;
+	RESET=1;
  	mDelaymS(200);
- 	REST=0;
-	mDelaymS(2);
-	REST=1;
- 	mDelaymS(20);	
+ 	RESET=0;
+	mDelayuS(2);
+	RESET=1;
+ 	mDelayuS(20);	
 	send_C(0x11);
-    mDelaymS(1);
+    mDelayuS(2);
     WREG(0x03,0x00,0xEC);  //config3设置内部电压参考,偏置基准、测量等
 	WREG(0x01,0x00,0x96);  
 	WREG(0x02,0x00,0xD4);  //config2设置内部测试信号,校准信号幅值、引线检测方式
@@ -188,34 +190,35 @@ void readADS()
  /*************************************************************/
 void readEEG()
 { 	 
-	 UINT8 q,x,y,z; 
-	 UINT8 i=0;
+	 UINT8 EEG_Data[3]={0,0,0};
 	 CS=1;
-	 START=0;
-	 mDelaymS(1);	
-     START=1;
-     mDelaymS(15);
-     while(1)
-     {   
-	  if(DRDY==0){ 
-	    readADS(); 
-	    if(ch1&0x800000){ 
-		  q=0x81;
+
+	 PORT_CFG &= ~bP1_OC;
+	 P1_DIR |= 0xfC;  //
+	 P1_IE |= 0x03;   //DOUT
+
+	 init_ADS();
+	 mDelayuS(1);	
+	 START=1;
+	 mDelayuS(15);
+	 
+	 while(1)
+	 {
+	  if(DRDY==0){  
+		readADS(); 
+		if(ch1&0x800000){ 
 		  ch1=~ch1+1;
-		  x=(ch1&0xff0000)>>16;
-		  y=(ch1&0x00ff00)>>8;
-		  z= ch1&0x0000ff;  
+		  EEG_Data[0]=(ch1&0xff0000)>>16;
+		  EEG_Data[0]|=0x80;
+		  EEG_Data[1]=(ch1&0x00ff00)>>8;
+		  EEG_Data[2]= ch1&0x0000ff;  
 		 }
 		else{
-		  q=0x80; 
-		  x=(ch1&0xff0000)>>16;
-		  y=(ch1&0x00ff00)>>8;
-		  z= ch1&0x0000ff;  
+		  EEG_Data[0]=(ch1&0xff0000)>>16;
+		  EEG_Data[1]=(ch1&0x00ff00)>>8;
+		  EEG_Data[2]= ch1&0x0000ff;  
 		}
-		SendData(&q);
-		SendData(&x);
-		SendData(&y);
-		SendData(&z);		
-      }
-     }
+		SendData(EEG_Data);	
+	  }
+	 }
 }

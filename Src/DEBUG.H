@@ -9,8 +9,8 @@
 #include "CH559.h"
 
 //定义函数返回值
-#ifndef  SUCESS
-#define  SUCESS  1
+#ifndef  SUCCESS
+#define  SUCCESS  1
 #endif
 #ifndef  FAIL
 #define  FAIL    0
