@@ -401,6 +401,11 @@
               <FileType>1</FileType>
               <FilePath>.\Src\GPIO.C</FilePath>
             </File>
+            <File>
+              <FileName>UART.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\UART.C</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

@@ -11,7 +11,7 @@
 
 #define	 FREQ_SYS	12000000	                                                   //系统主频12MHz
 #ifndef  BOUND
-#define  BOUND    57600
+#define  BOUND    9600//57600
 #endif
 
 /*******************************************************************************
@@ -117,13 +117,13 @@ void	mDelaymS( UINT16 n )                                                  // �
 * Output         : None
 * Return         : None
 *******************************************************************************/
-//void CH559UART0Alter()
-//{
-//    PORT_CFG |= bP0_OC;
-//    P0_DIR |= bTXD_;
-//    P0_PU |= bTXD_ | bRXD_;
-//    PIN_FUNC |= bUART0_PIN_X;                                                  //串口映射到P0.2和P0.3
-//}
+void CH559UART0Alter()
+{
+   PORT_CFG |= bP0_OC;
+   P0_DIR |= bTXD_;
+   P0_PU |= bTXD_ | bRXD_;
+   PIN_FUNC |= bUART0_PIN_X;                                                  //串口映射到P0.2和P0.3
+}
 
 /*******************************************************************************
 * Function Name  : mInitSTDIO()
@@ -138,12 +138,13 @@ void	mInitSTDIO( )
     UINT32 x;
     UINT8 x2; 
 
-    SM0 = 0;
-    SM1 = 1;
+    SM0 = 0;                                                                   //选择 8 位数据异步通信
+    SM1 = 1;                                                                   //设置可变波特率
     SM2 = 0;                                                                   //串口0使用模式1
                                                                                //使用Timer1作为波特率发生器
     RCLK = 0;                                                                  //UART0接收时钟
     TCLK = 0;                                                                  //UART0发送时钟
+
     PCON |= SMOD;
     x = 10 * FREQ_SYS / BOUND / 16;                             
     x2 = x % 10;
@@ -165,12 +166,12 @@ void	mInitSTDIO( )
 * Output         : None
 * Return         : SBUF
 *******************************************************************************/
-//UINT8  CH559UART0RcvByte( )
-//{
-//    while(RI == 0);                                                            //查询接收，中断方式可不用
-//    RI = 0;
-//    return SBUF;
-//}
+UINT8  CH559UART0RcvByte( )
+{
+   while(RI == 0);                                                            //查询接收，中断方式可不用
+   RI = 0;
+   return SBUF;
+}
 
 /*******************************************************************************
 * Function Name  : CH559UART0SendByte(UINT8 SendDat)
@@ -179,9 +180,9 @@ void	mInitSTDIO( )
 * Output         : None
 * Return         : None
 *******************************************************************************/
-//void CH559UART0SendByte(UINT8 SendDat)
-//{
-//	SBUF = SendDat;                                                              //查询发送，中断方式可不用下面2条语句,但发送前需TI=0
-//	while(TI ==0);
-//	TI = 1;
-//}
+void CH559UART0SendByte(UINT8 SendDat)
+{
+	SBUF = SendDat;                                                              //查询发送，中断方式可不用下面2条语句,但发送前需TI=0
+	while(TI ==0);
+	TI = 1;
+}

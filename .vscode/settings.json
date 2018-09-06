@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "debug.h": "c",
+        "debug.h\u0000debug.h": "c",
+        "debug.h\u0000ebug.h": "c",
+        "ads1299.h": "c"
+    }
+}

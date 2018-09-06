@@ -218,7 +218,12 @@ void readEEG()
 		  EEG_Data[1]=(ch1&0x00ff00)>>8;
 		  EEG_Data[2]= ch1&0x0000ff;  
 		}
-		SendData(EEG_Data);	
+		CH559UART0SendByte(EEG_Data[0]);
+		CH559UART0SendByte(EEG_Data[1]);
+		CH559UART0SendByte(EEG_Data[2]);
+		
+		//SendData(EEG_Data);	
 	  }
 	 }
+	 
 }
