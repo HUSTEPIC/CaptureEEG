@@ -176,7 +176,7 @@ void readADS()
     WREG(0x03,0x00,0xEC);  //config3设置内部电压参考,偏置基准、测量等
 	WREG(0x01,0x00,0x96);  
 	WREG(0x02,0x00,0xD4);  //config2设置内部测试信号,校准信号幅值、引线检测方式
-	WREG(0x05,0x00,0x00);  //ch1set 设置通道1电源模式，增益，SRB2，输入多路选择；
+	WREG(0x05,0x00,0x00);  //ch1set 设置通道1电源模式，增益1倍，SRB2，输入多路选择；
 	WREG(0x0D,0x00,0x01);  //BIAS_SENSP 设置通道1的P端为偏置驱动
 	WREG(0x0E,0x00,0x01);  //BIAS_SENSN 设置通道1的N端为偏置驱动   
 	START=0;
@@ -186,11 +186,31 @@ void readADS()
 	mDelaymS(1);
  }
 
+UINT8 toAscii(UINT8 *input)
+{
+	int i=0;
+	for(i=0; i<3; i++)
+	*(input+i) += '0';
+	
+	return 0;
+}
+
+UINT8 sendEEG(UINT8 *Txdata)
+{
+	int i=0;
+	//toAscii(Txdata);
+	CH559UART0SendByte('s');
+	CH559UART0SendByte('t');
+	for( i = 0; i<3; i++)
+	CH559UART0SendByte(*(Txdata+i));
+	
+	return 0;
+}
  
  /*************************************************************/
 void readEEG()
 { 	 
-	 UINT8 EEG_Data[3]={0,0,0};
+	 UINT8 EEG_Data[3]={'0','0','0'};
 	 CS=1;
 
 	 PORT_CFG &= ~bP1_OC;
@@ -206,22 +226,11 @@ void readEEG()
 	 {
 	  if(DRDY==0){  
 		readADS(); 
-		if(ch1&0x800000){ 
-		  ch1=~ch1+1;
-		  EEG_Data[0]=(ch1&0xff0000)>>16;
-		  EEG_Data[0]|=0x80;
-		  EEG_Data[1]=(ch1&0x00ff00)>>8;
-		  EEG_Data[2]= ch1&0x0000ff;  
-		 }
-		else{
-		  EEG_Data[0]=(ch1&0xff0000)>>16;
-		  EEG_Data[1]=(ch1&0x00ff00)>>8;
-		  EEG_Data[2]= ch1&0x0000ff;  
-		}
-		CH559UART0SendByte(EEG_Data[0]);
-		CH559UART0SendByte(EEG_Data[1]);
-		CH559UART0SendByte(EEG_Data[2]);
-		
+		EEG_Data[0]=(ch1&0xff0000)>>16;
+		EEG_Data[1]=(ch1&0x00ff00)>>8;
+		EEG_Data[2]= ch1&0x0000ff; 
+	
+		sendEEG(EEG_Data);
 		//SendData(EEG_Data);	
 	  }
 	 }
