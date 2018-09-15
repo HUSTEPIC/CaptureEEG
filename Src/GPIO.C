@@ -8,7 +8,7 @@
 											 bPn_OC & Pn_DIR & Pn_PU: pin input & output configuration for Pn (n=0/1/2/3)
 											 详细介绍请看CH559.H的 457行
 *******************************************************************************/
-#include "DEBUG.H"
+#include "TIME.H"
 
 #pragma  NOAREGS
 
@@ -139,8 +139,8 @@ void CH559P4Mode( )
 *******************************************************************************/
 void CH559GPIOInterruptInit()
 {                                                      
-	GPIO_IE &= ~bIE_IO_EDGE;                                                   //中断方式选择，该位为0则表示IO口电平中断，该位为1则表示IO口边沿中断
-	GPIO_IE |= bIE_RXD1_LO;                                                    //使能RXD1引脚的中断,其他引脚中断设置同理
+	GPIO_IE &= ~bIE_IO_EDGE;                                                   // 中断方式选择，该位为0则表示IO口电平中断，该位为1则表示IO口边沿中断
+	GPIO_IE |= bIE_RXD1_LO;                                                    // 使能RXD1引脚的中断,其他引脚中断设置同理
 }
 
 /*******************************************************************************
@@ -150,10 +150,10 @@ void CH559GPIOInterruptInit()
 * Output         : None
 * Return         : None   
 *******************************************************************************/
-void	GPIOInterrupt( void ) interrupt INT_NO_GPIO using 1                    //GPIO中断服务程序,使用寄存器组1
+void	GPIOInterrupt( void ) interrupt INT_NO_GPIO using 1                    // GPIO中断服务程序,使用寄存器组1
 {  
-    //RXD1_ = 1;
-//    printf("P5_IN %02X\n",(UINT16)P5_IN);                                     //bIO_INT_ACT为GPIO中断状态位
-    //IE_GPIO = 0;                                                            //使能GPIO中断
+    // RXD1_ = 1;
+    // printf("P5_IN %02X\n",(UINT16)P5_IN);                                   // bIO_INT_ACT为GPIO中断状态位
+    // IE_GPIO = 0;                                                            // 使能GPIO中断
 }
 

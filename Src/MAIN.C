@@ -1,24 +1,34 @@
+/**
+	@filename Main.C
+	@brief    Main Function
+	@author   tzaiyang
+	Copyright (c) 2018 EPIC. All rights reserved.
+*/
 #define NO_XSFR_DEFINE
 #include "CH559.h"
-#include "DEBUG.h"
+#include "TIME.h"
 #include "ADS1299.h"
-#include "USBCOM.h"
+#include "UART.h"
 
-extern UINT8 uart0_flag;
-void main()
-{	
+void main()  {	
 	UINT8 uartdata0=0;
-	mDelaymS(30);                                                                 //上电延时
+	mDelaymS(30);                     // 上电延时
+
+    mInitSTDIO( );                    // 串口0,可以用于调试
+    ES = 1;                           // 开启UART0中断
+    EA = 1;                           // 总中断开启,中断初始化
 	
-//  CfgFsys( );                                                                   //CH559时钟选择配置  
-	
-    mInitSTDIO( );                                                                //串口0,可以用于调试
-    ES = 1;                                                                      //开启UART0中断
-    EA = 1;                                                                      //总中断开启
-	// USBDeviceCfg();                                                               //设备模式配置
-    // USBDeviceEndPointCfg();														                            //端点配置
-    // USBDeviceIntCfg();															                              //中断初始化
-	
-    readEEG();
+	PORT_CFG &= ~bP1_OC;
+	P1_DIR |= 0xfC;  
+	P1_IE |= 0x03;   				  // DOUT
+
+	Init_ADS1299();
+	mDelayuS(1);	
+	START=1;
+	mDelayuS(15);
+
+	while(1)  {
+		Read_ADS1299();
+	}
 }
 

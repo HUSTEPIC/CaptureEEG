@@ -377,16 +377,6 @@
           <GroupName>CaptureEEG</GroupName>
           <Files>
             <File>
-              <FileName>DEBUG.C</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Src\DEBUG.C</FilePath>
-            </File>
-            <File>
-              <FileName>USBCOM.C</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Src\USBCOM.C</FilePath>
-            </File>
-            <File>
               <FileName>ADS1299.C</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\ADS1299.C</FilePath>
@@ -405,6 +395,11 @@
               <FileName>UART.C</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\UART.C</FilePath>
+            </File>
+            <File>
+              <FileName>TIME.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\TIME.C</FilePath>
             </File>
           </Files>
         </Group>
