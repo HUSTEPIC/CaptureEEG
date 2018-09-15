@@ -11,7 +11,6 @@
 #include "UART.h"
 
 void main()  {	
-	UINT8 uartdata0=0;
 	mDelaymS(30);                     // 上电延时
 
     mInitSTDIO( );                    // 串口0,可以用于调试

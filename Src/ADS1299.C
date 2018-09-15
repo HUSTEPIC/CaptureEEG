@@ -17,7 +17,6 @@ void SPI_send(UINT8 spidata)
 {
 	UINT8 i;
 	ASCLK = 0;
-	CS=0;
 	mDelayuS(1);
 	for (i=0;i<8;i++)		
    {
@@ -31,7 +30,6 @@ void SPI_send(UINT8 spidata)
 	ASCLK = 0; 
   	mDelayuS(2);
    }
-    CS=1;
 }
 /***********SPI Send Function**************
 	@param  void
@@ -42,15 +40,13 @@ UINT8 SPI_read(void)
     UINT8 j,d;
 	for (j=0;j<8;j++)		
 	{	 
-	d=d<<1;
-	ASCLK = 0;
-	mDelaymS(2);
-	ASCLK=1;
-	mDelaymS(2);
-	if(DOUT==1)	d=d|0x01;
-	DIN=0;  
+		d=d<<1;
+		ASCLK = 0;
+		mDelayuS(2);
+		ASCLK=1;
+		mDelayuS(2);
+		if(DOUT==1)	d=d|0x01;
 	}
-	CS=1;
 	ASCLK=0;
 	return d;
 }
@@ -65,11 +61,13 @@ void WREG(UINT8 x, UINT8 y, UINT8 d)
 {  
 	x=x|0x40;
 	y=y&0x1F;
+	CS=0;
 	SPI_send(x);
 	mDelayuS(8);
 	SPI_send(y);
 	mDelayuS(2);
 	SPI_send(d);
+	CS=1;
 }
 
 /***********Read A Register**************
@@ -81,13 +79,14 @@ UINT8 RREG(UINT8 x, UINT8 y)
 {
 	x=x|0x20;
 	y=y&0x1F;
-	ASCLK = 0;
 	CS=0;
+	ASCLK = 0;
 	mDelaymS(1);
 	SPI_send(x);
 	mDelaymS(8);
 	SPI_send(y);
 	mDelaymS(2);
+	CS=1;
 	return SPI_read();
 }
 
@@ -108,10 +107,11 @@ UINT8 RDATAC(UINT32 *ch)
 			mDelayuS(2);
 			ASCLK=1;
 			mDelayuS(2);
-			if(DOUT==1)	temp=temp|0x01; 
-			DIN=0; 
+			if(DOUT==1)	temp=temp|0x01;
 		}
 		*(ch+i)=temp;
+		temp=0;
+		j=0;
 	}
 	CS=1;
 	ASCLK=0;
@@ -124,7 +124,7 @@ UINT8 RDATAC(UINT32 *ch)
 ***************************************************/
 void Read_ADS1299()
 {
-	UINT32 ch[9];
+	UINT32 ch[9]={0};
 	UINT8 EEG_Data[3]={0};
 	if(DRDY==0){
 		RDATAC(ch);
@@ -150,8 +150,10 @@ void Init_ADS1299()
 	RESET=0;
 	mDelayuS(2);
 	RESET=1;
-	mDelayuS(20);	
+	mDelayuS(20);
+	CS=0;
 	SPI_send(0x11);
+	CS=1;
 	mDelayuS(2);
 	WREG(0x03,0x00,0xEC);  //Configures either an internal or exteral reference and BIAS operation
 	WREG(0x01,0x00,0x96);  //This register configures the DAISY_EN bit, clock, and data rate
@@ -162,7 +164,9 @@ void Init_ADS1299()
 	START=0;
 	mDelaymS(1);
 	START=1;
+	CS=0;
 	SPI_send(0x10);
+	CS=1;
 	mDelaymS(1);
 }
 
