@@ -13,12 +13,12 @@
 void main()  {	
 	mDelaymS(30);                     // 上电延时
 
-    mInitSTDIO( );                    // 串口0,可以用于调试
-    ES = 1;                           // 开启UART0中断
-    EA = 1;                           // 总中断开启,中断初始化
+	mInitSTDIO( );                    // 串口0,可以用于调试
+	ES = 1;                           // 开启UART0中断
+	EA = 1;                           // 总中断开启,中断初始化
 	
 	PORT_CFG &= ~bP1_OC;
-	P1_DIR |= 0xfC;  
+	P1_DIR |= 0xfC;  		
 	P1_IE |= 0x03;   				  // DOUT
 
 	Init_ADS1299();

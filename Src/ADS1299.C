@@ -138,6 +138,7 @@ void Read_ADS1299()
 /***********Init ADS1299 IC**************
 	@param  void
 	@retval void
+
 ****************************************/
 void Init_ADS1299()
 {

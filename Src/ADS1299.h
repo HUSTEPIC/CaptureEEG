@@ -20,8 +20,8 @@ sbit DOUT = P1^6;
 sbit ASCLK = P1^7;
 sbit DRDY = P2^5;
 sbit START = P1^2;
-sbit PWDN = P3^2;
-sbit RESET = P3^4;
+sbit PWDN = P3^4;
+sbit RESET = P3^2;
 #else
 sbit CS = P1^3;
 sbit DIN = P1^7;
